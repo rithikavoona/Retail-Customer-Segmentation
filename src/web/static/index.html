@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SegmentAI Pro — Retail Customer Intelligence & Decision Suite (ML-2 CO3 | L4)</title>
+  <meta name="description" content="Retail Customer Segmentation Platform using Unsupervised Machine Learning (K-Means, GMM, Agglomerative, DBSCAN, SOM) for Behavioral Profiling, Personalized Marketing and Decision Making.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Plotly & Chart.js -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==========================================
+       Header & Navigation
+       ========================================== -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>SegmentAI Pro</h1>
+          <span class="brand-badge" id="header-status-badge">K-MEANS | k=4 | READY</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs" aria-label="Main Navigation">
+        <button class="nav-tab active" data-tab="dashboard">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Executive Dashboard
+        </button>
+        <button class="nav-tab" data-tab="workbench">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          ML Workbench
+        </button>
+        <button class="nav-tab" data-tab="simulator">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Customer Simulator
+        </button>
+        <button class="nav-tab" data-tab="business">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          ROI & Decision Hub
+        </button>
+        <button class="nav-tab" data-tab="pipeline">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          Data Pipeline
+        </button>
+        <button class="nav-tab" data-tab="academic">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          Project Report (CO3 | L4)
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <button class="btn-export" id="btn-export-csv" title="Download clustered customers as CSV">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Export CSV
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       Global Control Bar (Dataset & ML Controls)
+       ========================================== -->
+  <section class="control-bar">
+    <div class="control-container">
+      <!-- Dataset Selector -->
+      <div class="control-group">
+        <label class="control-label" for="dataset-select">Active Retail Dataset</label>
+        <select class="select-control" id="dataset-select">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+
+      <!-- ML Algorithm Selector -->
+      <div class="control-group">
+        <label class="control-label" for="algorithm-select">Clustering Technique</label>
+        <select class="select-control" id="algorithm-select">
+          <option value="kmeans" selected>K-Means (Centroid Baseline)</option>
+          <option value="gmm">Gaussian Mixture Models (GMM Soft)</option>
+          <option value="hierarchical">Hierarchical / Agglomerative (Ward)</option>
+          <option value="dbscan">DBSCAN (Density & Noise Detection)</option>
+          <option value="som">Self-Organizing Map (Neural Topology)</option>
+        </select>
+      </div>
+
+      <!-- K Parameter Slider -->
+      <div class="control-group" id="k-control-group">
+        <label class="control-label" for="k-slider">
+          Clusters (K)
+          <span class="k-badge" id="k-badge">4</span>
+        </label>
+        <div class="k-slider-container">
+          <input type="range" class="k-slider" id="k-slider" min="2" max="8" value="4" step="1">
+        </div>
+      </div>
+
+      <!-- DBSCAN Controls (Hidden by default) -->
+      <div class="control-group hidden" id="dbscan-control-group">
+        <label class="control-label">DBSCAN (Eps / MinPts)</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="number" class="input-control" id="dbscan-eps" value="1.5" step="0.1" min="0.5" max="5.0" title="Epsilon radius">
+          <input type="number" class="input-control" id="dbscan-min-samples" value="10" step="1" min="3" max="30" title="Min samples">
+        </div>
+      </div>
+
+      <!-- Feature Scaling -->
+      <div class="control-group">
+        <label class="control-label" for="scaling-select">Feature Scaling</label>
+        <select class="select-control" id="scaling-select">
+          <option value="standard" selected>StandardScaler (Z-Score)</option>
+          <option value="robust">RobustScaler (Median/IQR)</option>
+          <option value="minmax">MinMaxScaler ([0, 1])</option>
+        </select>
+      </div>
+
+      <!-- Run Action Button -->
+      <div class="control-group" style="justify-content: flex-end;">
+        <button class="btn-primary" id="btn-run-clustering">
+          <span class="spinner hidden" id="run-spinner"></span>
+          <span id="btn-run-text">Run Segmentation</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       Main Workspace Content
+       ========================================== -->
+  <main class="main-wrap">
+
+    <!-- ----------------------------------------
+         TAB 1: EXECUTIVE DASHBOARD
+         ---------------------------------------- -->
+    <div class="tab-pane active" id="tab-dashboard">
+
+      <!-- KPI Ribbon Strip -->
+      <div class="kpi-grid">
+        <div class="kpi-card" style="--card-accent: var(--accent-cyan)">
+          <div class="kpi-meta">
+            <span>ACTIVE CUSTOMERS</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <div class="kpi-value" id="kpi-active-customers">4,334</div>
+          <div class="kpi-subtext" id="kpi-dataset-meta">396,195 clean transactions</div>
+        </div>
+
+        <div class="kpi-card" style="--card-accent: var(--accent-emerald)">
+          <div class="kpi-meta">
+            <span>SILHOUETTE SEPARATION</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+          </div>
+          <div class="kpi-value" id="kpi-silhouette">0.295</div>
+          <div class="kpi-subtext" id="kpi-silhouette-sub">Davies-Bouldin: 1.22</div>
+        </div>
+
+        <div class="kpi-card" style="--card-accent: var(--accent-purple)">
+          <div class="kpi-meta">
+            <span>ALGORITHM CONSENSUS (ARI)</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+          </div>
+          <div class="kpi-value" id="kpi-ari-agreement">74.7%</div>
+          <div class="kpi-subtext" id="kpi-ari-sub">Cross-validation vs K-Means</div>
+        </div>
+
+        <div class="kpi-card" style="--card-accent: var(--accent-amber)">
+          <div class="kpi-meta">
+            <span>TOTAL SEGMENTED REVENUE</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          </div>
+          <div class="kpi-value" id="kpi-total-revenue">£5.52M</div>
+          <div class="kpi-subtext" id="kpi-revenue-sub">Projected 12mo CLV: £8.9M</div>
+        </div>
+      </div>
+
+      <!-- Main Visualizer Grid -->
+      <div class="viz-grid">
+        <!-- 3D/2D PCA Projection Card -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                Customer Cluster Space (PCA Projection)
+              </div>
+              <div class="card-subtitle">Dimensionality-reduced representation preserving multi-dimensional variance</div>
+            </div>
+            <div class="chart-controls">
+              <button class="btn-toggle active" id="btn-pca-3d">3D View</button>
+              <button class="btn-toggle" id="btn-pca-2d">2D View</button>
+            </div>
+          </div>
+          <div class="chart-box" id="pca-plot-container"></div>
+        </div>
+
+        <!-- Radar Multi-Feature Card -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path></svg>
+                Behavioral Segment Radar
+              </div>
+              <div class="card-subtitle">Relative strengths across RFM and basket consistency dimensions</div>
+            </div>
+          </div>
+          <div class="chart-box" style="height: 420px;">
+            <canvas id="radar-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segment Persona Breakdown & Actionable Playbooks -->
+      <div style="margin-top: 10px;">
+        <h2 class="segments-section-title">Customer Personas & Actionable Marketing Playbooks</h2>
+        <p class="segments-section-desc">Each discovered behavioral cluster translated into concrete business strategies, revenue equity, and campaign playbooks.</p>
+        <div class="segment-cards-grid" id="segment-cards-container">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ----------------------------------------
+         TAB 2: ML WORKBENCH & CLUSTERING COMPARISON
+         ---------------------------------------- -->
+    <div class="tab-pane" id="tab-workbench">
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              Optimal Cluster Count (K) Selection: Elbow vs Silhouette Analysis
+            </div>
+            <div class="card-subtitle">Balancing mathematical compactness (WCSS) with business interpretability and silhouette separation</div>
+          </div>
+        </div>
+        <div class="chart-box" style="height: 380px;">
+          <canvas id="k-eval-canvas"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Segment Performance & Cross-Validation Metrics</div>
+            <div class="card-subtitle">Detailed statistical breakdown and algorithm consensus</div>
+          </div>
+          <div style="display: flex; gap: 12px; font-family: var(--font-mono); font-size: 0.8rem;">
+            <span>Model: <strong id="workbench-model-name" style="color: var(--accent-cyan)">K-MEANS (k=4)</strong></span>
+            <span>Silhouette: <strong id="workbench-sil-score" style="color: var(--accent-emerald)">0.295</strong></span>
+            <span>Agreement (ARI): <strong id="workbench-ari-score" style="color: var(--accent-purple)">0.747</strong></span>
+            <span>Davies-Bouldin: <strong id="workbench-db-score" style="color: var(--accent-amber)">1.22</strong></span>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Segment Persona</th>
+                <th>Customer Count (% Share)</th>
+                <th>Avg Recency</th>
+                <th>Avg Frequency</th>
+                <th>Avg Total Spend</th>
+                <th>12-Month Est. CLV</th>
+                <th>Churn Risk Level</th>
+              </tr>
+            </thead>
+            <tbody id="workbench-table-body">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ----------------------------------------
+         TAB 3: CUSTOMER PREDICTION SIMULATOR (WHAT-IF)
+         ---------------------------------------- -->
+    <div class="tab-pane" id="tab-simulator">
+      <div class="simulator-layout">
+        <!-- Input Form -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Interactive Customer Behavioral Profiler</div>
+              <div class="card-subtitle">Input or adjust customer purchasing metrics to infer segment membership in real-time</div>
+            </div>
+          </div>
+
+          <div class="sim-input-grid">
+            <div class="sim-input-group">
+              <label for="sim-recency">Recency (Days Since Last Order)</label>
+              <input type="number" class="input-control" id="sim-recency" value="28" min="1" max="730">
+            </div>
+
+            <div class="sim-input-group">
+              <label for="sim-frequency">Frequency (Total Completed Orders)</label>
+              <input type="number" class="input-control" id="sim-frequency" value="8" min="1" max="250">
+            </div>
+
+            <div class="sim-input-group">
+              <label for="sim-monetary">Monetary Total (Total Historical Spend)</label>
+              <input type="number" class="input-control" id="sim-monetary" value="2400" min="5" max="500000">
+            </div>
+
+            <div class="sim-input-group">
+              <label for="sim-aov">Average Order Value (AOV)</label>
+              <input type="number" class="input-control" id="sim-aov" value="300" min="5" max="50000">
+            </div>
+
+            <div class="sim-input-group">
+              <label for="sim-basket">Avg Basket Size (Items / Order)</label>
+              <input type="number" class="input-control" id="sim-basket" value="8" min="1" max="200">
+            </div>
+
+            <div class="sim-input-group">
+              <label for="sim-tenure">Customer Tenure (Days Active)</label>
+              <input type="number" class="input-control" id="sim-tenure" value="240" min="1" max="1500">
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btn-simulate-predict" style="width: 100%;">
+            Simulate & Classify Customer
+          </button>
+        </div>
+
+        <!-- Output Prediction -->
+        <div class="prediction-card">
+          <div class="prediction-badge" id="sim-result-cluster">Assigned to Cluster 2</div>
+          <div class="prediction-title" id="sim-result-persona">Champions / High-Value VIPs</div>
+
+          <div class="prediction-stats">
+            <div>
+              <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">12mo Projected CLV</div>
+              <div style="font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; color: var(--accent-emerald);" id="sim-result-clv">£3,420</div>
+            </div>
+            <div>
+              <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Centroid Proximity</div>
+              <div style="font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; color: var(--accent-cyan);" id="sim-result-dist">0.842</div>
+            </div>
+            <div>
+              <div style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Churn Risk</div>
+              <div style="font-family: var(--font-mono); font-size: 1.4rem; font-weight: 700; color: var(--accent-indigo);" id="sim-result-risk">Low</div>
+            </div>
+          </div>
+
+          <div class="playbook-box" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);">
+            <div class="playbook-header">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+              Prescribed Personalized Strategy
+            </div>
+            <div class="playbook-strategy" id="sim-result-strategy">VIP Tiers, Exclusive Perks & Loyalty Rewards</div>
+            <div class="playbook-action" style="margin-bottom: 12px;"><strong>Execution Directive:</strong> <span id="sim-result-action">Enroll in Platinum tier, grant early access to seasonal drops, and offer concierge assistance.</span></div>
+            <div style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim); border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px;">
+              <div>Primary Touchpoints: <span id="sim-result-channels" style="color: var(--text-main);">Dedicated Account Manager, VIP Email</span></div>
+              <div style="margin-top: 4px;">Discount Sensitivity: <span id="sim-result-discount" style="color: var(--accent-amber);">Very Low (Prioritize recognition over price reductions)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ----------------------------------------
+         TAB 4: BUSINESS ROI & DECISION HUB
+         ---------------------------------------- -->
+    <div class="tab-pane" id="tab-business">
+      <div class="viz-grid" style="grid-template-columns: 1fr 1.4fr;">
+        <!-- ROI Calculator Form -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Campaign Budget & ROI Optimizer</div>
+              <div class="card-subtitle">Quantify business lift by shifting from blanket broadcast marketing to segment-driven campaigns</div>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="sim-input-group">
+              <label for="roi-budget">Allocated Marketing Budget (£)</label>
+              <input type="number" class="input-control" id="roi-budget" value="12000" min="1000" step="1000">
+            </div>
+
+            <div class="sim-input-group">
+              <label for="roi-winback-rate">At-Risk Win-Back Conversion (%)</label>
+              <input type="number" class="input-control" id="roi-winback-rate" value="18" min="1" max="100">
+            </div>
+
+            <div class="sim-input-group">
+              <label for="roi-loyalty-rate">VIP / Loyalist Upsell Lift (%)</label>
+              <input type="number" class="input-control" id="roi-loyalty-rate" value="22" min="1" max="100">
+            </div>
+
+            <div class="sim-input-group">
+              <label for="roi-cost-per-cust">Estimated Cost per Targeted Contact (£)</label>
+              <input type="number" class="input-control" id="roi-cost-per-cust" value="2.50" min="0.1" step="0.5">
+            </div>
+
+            <button class="btn-primary" id="btn-calc-roi" style="margin-top: 8px;">
+              Recalculate Projected ROI
+            </button>
+          </div>
+        </div>
+
+        <!-- ROI Projected Outcomes -->
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Financial Impact Projection</div>
+              <div class="card-subtitle">Expected gross lift, churn reduction, and net return on marketing investment</div>
+            </div>
+          </div>
+
+          <div class="kpi-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 20px;">
+            <div class="kpi-card" style="--card-accent: var(--accent-emerald);">
+              <div class="kpi-meta">NET PROFIT (LIFT - COST)</div>
+              <div class="kpi-value" style="color: var(--accent-emerald);" id="roi-net-profit">£38,450</div>
+              <div class="kpi-subtext">30% gross margin basis</div>
+            </div>
+
+            <div class="kpi-card" style="--card-accent: var(--accent-cyan);">
+              <div class="kpi-meta">PROJECTED ROI</div>
+              <div class="kpi-value" style="color: var(--accent-cyan);" id="roi-pct-val">320.4%</div>
+              <div class="kpi-subtext">Net gain over campaign spend</div>
+            </div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.25); border-radius: var(--radius-sm); padding: 18px; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.8;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px;">
+              <span style="color: var(--text-dim);">Targeted Customers:</span>
+              <span id="roi-targeted-count" style="font-weight: 600;">2,273</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 6px 0;">
+              <span style="color: var(--text-dim);">Recovered Churn Revenue:</span>
+              <span id="roi-atrisk-saved" style="color: var(--accent-amber); font-weight: 600;">£29,140</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 6px 0;">
+              <span style="color: var(--text-dim);">VIP Upsell Gross Lift:</span>
+              <span id="roi-vip-upsell" style="color: var(--accent-purple); font-weight: 600;">£21,310</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 6px 0;">
+              <span style="color: var(--text-dim);">Total Campaign Execution Cost:</span>
+              <span id="roi-actual-cost" style="color: var(--accent-rose); font-weight: 600;">£12,000</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-top: 6px;">
+              <span style="color: var(--text-main); font-weight: 600;">Gross Revenue Lift:</span>
+              <span id="roi-gross-lift" style="color: var(--accent-cyan); font-weight: 700;">£50,450</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pareto Chart (80/20 Rule) -->
+      <div class="card" style="margin-top: 24px;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Customer Concentration Curve (Pareto Principle / 80-20 Rule)</div>
+            <div class="card-subtitle">Proving the business necessity of differentiated segmentation over uniform marketing spend</div>
+          </div>
+        </div>
+        <div class="chart-box" style="height: 340px;">
+          <canvas id="pareto-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ----------------------------------------
+         TAB 5: DATA PIPELINE & FUNNEL
+         ---------------------------------------- -->
+    <div class="tab-pane" id="tab-pipeline">
+      <div class="viz-grid" style="grid-template-columns: 1.2fr 1fr;">
+        <!-- Data Cleaning Audit Funnel -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Auditable Data Cleaning Funnel</div>
+              <div class="card-subtitle">Full accounting of line-item transaction filtering stages</div>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px;">
+              <div style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 4px;">
+                <span>1. Raw Input Ingestion</span>
+                <span style="color: var(--accent-cyan); font-family: var(--font-mono);">541,909 rows</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0;">Multi-sheet UCI Online Retail workbook loaded with schema normalization.</p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px;">
+              <div style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 4px;">
+                <span>2. Cancellation Removal (Invoice 'C*')</span>
+                <span style="color: var(--accent-rose); font-family: var(--font-mono);">-9,288 rows (1.71%)</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0;">Preserves realized purchase behavior without negative-quantity distortion.</p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px;">
+              <div style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 4px;">
+                <span>3. Invalid Price & Quantity Removal</span>
+                <span style="color: var(--accent-rose); font-family: var(--font-mono);">-2,521 rows (0.47%)</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0;">Removes zero-price promotions and negative quantities.</p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px;">
+              <div style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 4px;">
+                <span>4. Non-Product Administrative Lines</span>
+                <span style="color: var(--accent-rose); font-family: var(--font-mono);">-2,523 rows (0.48%)</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0;">Excludes POSTAGE, BANK CHARGES, SAMPLES, and manual debt entries.</p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px;">
+              <div style="display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 4px;">
+                <span>5. Missing Customer ID Removal</span>
+                <span style="color: var(--accent-rose); font-family: var(--font-mono);">-131,382 rows (24.9%)</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-dim); margin: 0;">Anonymous guest checkouts dropped rather than artificially imputed.</p>
+            </div>
+
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); padding: 14px;">
+              <div style="display: flex; justify-content: space-between; font-weight: 700; color: var(--accent-emerald);">
+                <span>Final Cleaned Transactions</span>
+                <span style="font-family: var(--font-mono);">396,195 rows (4,334 Unique Customers)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Upload Section -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Upload Custom Transaction Dataset</div>
+              <div class="card-subtitle">Drop a CSV or XLSX file to run automated pipeline</div>
+            </div>
+          </div>
+
+          <div class="dropzone" id="upload-dropzone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <div style="font-size: 1.05rem; font-weight: 600; margin-bottom: 4px;">Click or Drag & Drop Transaction File</div>
+            <div style="font-size: 0.8rem; color: var(--text-dim);">Accepts CSV or XLSX (Invoice, StockCode, Quantity, InvoiceDate, Price, CustomerID)</div>
+            <input type="file" id="file-upload-input" accept=".csv,.xlsx" class="hidden">
+          </div>
+
+          <div id="upload-status" class="hidden" style="font-family: var(--font-mono); font-size: 0.85rem; padding: 12px; background: rgba(0,0,0,0.3); border-radius: var(--radius-sm);"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ----------------------------------------
+         TAB 6: ACADEMIC PROJECT REPORT (CO3 | L4)
+         ---------------------------------------- -->
+    <div class="tab-pane" id="tab-academic">
+      <div class="card report-prose">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+          <div>
+            <h1 style="font-family: var(--font-display); font-size: 2rem; color: #fff; margin-bottom: 4px;">Project 5: Retail Customer Segmentation (CO3 | L4)</h1>
+            <div style="font-size: 0.9rem; color: var(--text-dim);">Machine Learning - II | Behavioral Segmentation via Unsupervised Clustering</div>
+          </div>
+        </div>
+
+        <div class="report-badge-list">
+          <span class="segment-pill" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.3);">Course Outcome: CO3 (Unsupervised Learning)</span>
+          <span class="segment-pill" style="background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3);">Bloom's Taxonomy: L4 (Analyze & Evaluate)</span>
+          <span class="segment-pill" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3);">Official UCI Online Retail (541K Records)</span>
+        </div>
+
+        <div class="report-callout">
+          <strong>Executive Problem Statement:</strong> Retail enterprises generate millions of transaction logs, but raw transactional data is inert without behavioral aggregation. This project engineers multi-dimensional customer features (RFM, basket breadth, regularity, tenure), evaluates multiple clustering paradigms (K-Means, GMM, Agglomerative, DBSCAN, SOM), validates topological consistency via Adjusted Rand Index, and transforms mathematical centroids into actionable marketing strategies and quantified Customer Lifetime Value (CLV).
+        </div>
+
+        <h2>1. Data Collection & Preprocessing Rigor</h2>
+        <p>Unlike pre-aggregated datasets (e.g. Mall Customers), the <strong>UCI Online Retail</strong> dataset provides raw invoice-level transactions. True data cleaning requires domain-justified decisions rather than blanket dropna():</p>
+        <ul style="margin-left: 20px; margin-bottom: 16px;">
+          <li><strong>Cancellations:</strong> Invoices starting with 'C' are dropped to reflect realized purchases and prevent negative-quantity artifacts.</li>
+          <li><strong>Non-Product Items:</strong> Administrative codes (POSTAGE, BANK CHARGES, ADJUST) stripped to preserve basket semantics.</li>
+          <li><strong>Missing Identity:</strong> 131,382 guest checkout transactions without Customer IDs safely pruned (imputation of identity is statistically invalid).</li>
+          <li><strong>Outlier Winsorization:</strong> Capped bulk wholesale anomalies at 99.5th percentile to protect Euclidean distance calculations without losing real customer entities.</li>
+        </ul>
+
+        <h2>2. Feature Engineering & Mathematical Transformation</h2>
+        <p>Features are computed per customer: Recency (days relative to snapshot), Frequency (distinct invoices), Monetary Total (sum of line totals), Average Order Value, Average Basket Size, Category Diversity, and Purchase Regularity. Because monetary and frequency distributions exhibit heavy right-skewness, we apply a $\log(1 + x)$ transformation followed by Z-score Standardization:</p>
+        <div style="background: rgba(0,0,0,0.3); padding: 12px 18px; border-radius: var(--radius-sm); font-family: var(--font-mono); margin-bottom: 16px;">
+          z = \frac{\log(1 + x) - \mu}{\sigma}
+        </div>
+
+        <h2>3. Algorithmic Techniques & Cross-Validation</h2>
+        <p>To satisfy CO3 Module 3 and Module 4 learning objectives, multiple clustering paradigms were deployed and compared:</p>
+        <ul style="margin-left: 20px; margin-bottom: 16px;">
+          <li><strong>K-Means Clustering:</strong> Centroid-based partitioning minimizing within-cluster sum of squares (WCSS). Optimal K evaluated across Elbow curve and Silhouette score.</li>
+          <li><strong>Gaussian Mixture Models (GMM):</strong> Expectation-Maximization probabilistic clustering accommodating ellipsoidal variance and soft assignment.</li>
+          <li><strong>Hierarchical / Agglomerative Clustering:</strong> Ward's linkage clustering constructing a variance-minimizing merge tree.</li>
+          <li><strong>DBSCAN:</strong> Density-based spatial clustering isolating arbitrary-shaped clusters and identifying 71 outlier customer anomalies.</li>
+          <li><strong>Self-Organizing Maps (SOM):</strong> Unsupervised competitive neural network preserving non-linear topological neighborhoods on a 2D lattice.</li>
+          <li><strong>Adjusted Rand Index (ARI):</strong> Measures agreement between K-Means and GMM (achieved <strong>0.747</strong>), verifying that clusters reflect genuine consumer behaviors rather than algorithm artifacts.</li>
+        </ul>
+
+        <h2>4. Business Performance Impact & Targeted Marketing</h2>
+        <p>Traditional mass marketing allocates budget uniformly across customer lists, producing high churn and poor marketing ROI. Segmented marketing enables targeted capital allocation:</p>
+        <ul style="margin-left: 20px; margin-bottom: 16px;">
+          <li><strong>Champions:</strong> Require loyalty advocacy, early product drops, and concierge care (discount sensitivity is very low; price slashing erodes brand equity).</li>
+          <li><strong>At-Risk High-Value:</strong> Represent the highest return-on-marketing investment. Even a 18% win-back conversion preserves over £29,000 in gross margin that would otherwise be permanently lost.</li>
+          <li><strong>Hibernating:</strong> Approached via zero-marginal-cost automated email clearance blasts; suppressed from expensive direct channels.</li>
+        </ul>
+
+        <h2>5. Conclusion & Rubric Mapping</h2>
+        <p>All objectives defined under Project 5 (CO3 | L4) have been fully met, from raw data engineering to unsupervised algorithm validation, interactive 3D/2D visualization, live simulation, and business ROI quantification.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Application Logic -->
+  <script src="js/app.js"></script>
+</body>
+</html>

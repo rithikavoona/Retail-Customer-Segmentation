@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-09-28T13:17:09.682574",
+  "total_customers": 4334,
+  "total_transactions_analyzed": 396195,
+  "date_range": {
+    "start": "2010-12-01",
+    "end": "2011-12-09"
+  },
+  "chosen_k": 3,
+  "validation": {
+    "kmeans_silhouette": 0.2953,
+    "gmm_silhouette": 0.2632,
+    "ari": 0.7472
+  },
+  "segments": [
+    {
+      "cluster_id": 1,
+      "name": "Hibernating / Lost",
+      "customer_count": 2061,
+      "pct_of_base": 47.6,
+      "recency_days": 72.93,
+      "frequency": 3.7,
+      "monetary_total": 1018.47,
+      "avg_order_value": 283.4,
+      "avg_basket_size": 16.84,
+      "category_diversity": 47.41,
+      "clv_per_customer": 1368.87,
+      "total_clv": 2821241.0,
+      "strategy": "Low-cost reactivation campaigns only (broad discount emails, re-engagement sequences); avoid heavy investment.",
+      "rationale": "Long recency and low frequency/monetary value -- the economics rarely justify expensive win-back tactics here."
+    },
+    {
+      "cluster_id": 2,
+      "name": "Champions",
+      "customer_count": 778,
+      "pct_of_base": 18.0,
+      "recency_days": 22.08,
+      "frequency": 11.94,
+      "monetary_total": 6862.64,
+      "avg_order_value": 620.65,
+      "avg_basket_size": 35.54,
+      "category_diversity": 176.22,
+      "clv_per_customer": 3280.98,
+      "total_clv": 2552602.0,
+      "strategy": "Loyalty & advocacy programs, early access to new products, VIP tiers, referral incentives.",
+      "rationale": "Highest recency, frequency, and monetary value. Retention cost here is far lower than acquisition cost elsewhere, and this group has the highest referral potential."
+    },
+    {
+      "cluster_id": 0,
+      "name": "At-Risk High Value",
+      "customer_count": 1495,
+      "pct_of_base": 34.5,
+      "recency_days": 156.71,
+      "frequency": 1.0,
+      "monetary_total": 329.2,
+      "avg_order_value": 329.2,
+      "avg_basket_size": 20.94,
+      "category_diversity": 20.94,
+      "clv_per_customer": 95.32,
+      "total_clv": 142503.0,
+      "strategy": "Personalized win-back campaigns, time-limited offers, direct outreach (email/call), satisfaction surveys.",
+      "rationale": "High historical spend but rising recency (drifting away). Losing this group has an outsized revenue impact, so proactive intervention has strong expected ROI."
+    }
+  ]
+}

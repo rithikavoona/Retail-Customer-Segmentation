@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Retail Customer Segmentation — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --paper: #F1F0E8;
+    --paper-raised: #FAFAF5;
+    --ink: #1B1D19;
+    --ink-soft: #5B5D54;
+    --line: #CFCDBF;
+    --champion: #2F6F52;
+    --atrisk: #B5622B;
+    --hibernating: #767A73;
+    --stamp: #A23B2E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Serif 4', Georgia, serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace; font-feature-settings:"tnum" 1;}
+  .wrap{max-width:920px; margin:0 auto; padding:48px 28px 80px;}
+
+  /* ---------- Header ---------- */
+  header{border-bottom:2px solid var(--ink); padding-bottom:20px; margin-bottom:8px;}
+  .eyebrow{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.04em;
+    color:var(--ink-soft); margin-bottom:10px;
+  }
+  h1{font-size:32px; font-weight:600; margin:0 0 6px; letter-spacing:-0.01em;}
+  .subtitle{color:var(--ink-soft); font-size:16px; margin:0; max-width:64ch;}
+
+  /* ---------- KPI strip ---------- */
+  .kpi-strip{
+    display:grid; grid-template-columns:repeat(4,1fr);
+    border-bottom:1px solid var(--line); margin-bottom:40px;
+  }
+  .kpi{padding:22px 18px 22px 0; border-right:1px solid var(--line);}
+  .kpi:last-child{border-right:none;}
+  .kpi-value{font-family:'IBM Plex Mono', monospace; font-size:26px; font-weight:600; display:block;}
+  .kpi-label{font-size:13px; color:var(--ink-soft); margin-top:4px; display:block;}
+
+  /* ---------- Section titles ---------- */
+  .section-title{
+    font-size:13px; font-family:'IBM Plex Mono', monospace; letter-spacing:0.03em;
+    color:var(--ink-soft); margin:0 0 18px; padding-bottom:8px; border-bottom:1px solid var(--line);
+  }
+
+  /* ---------- Segment ledger rows ---------- */
+  .segments{margin-bottom:44px;}
+  .segment-row{
+    display:grid; grid-template-columns:5px 1fr; margin-bottom:14px;
+    background:var(--paper-raised); border:1px solid var(--line); cursor:pointer;
+    transition:border-color 0.15s ease;
+  }
+  .segment-row:hover{border-color:var(--ink-soft);}
+  .segment-row.active{border-color:var(--ink);}
+  .stripe{background:var(--tier-color, var(--ink-soft));}
+  .segment-main{padding:18px 22px;}
+  .segment-head{display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px;}
+  .segment-name{font-size:19px; font-weight:600;}
+  .segment-meta{font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--ink-soft);}
+  .segment-metrics{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
+    margin-top:14px; padding-top:14px; border-top:1px dashed var(--line);
+  }
+  .metric{font-family:'IBM Plex Mono', monospace;}
+  .metric .num{font-size:15px; font-weight:600; display:block;}
+  .metric .lbl{font-size:11px; color:var(--ink-soft); text-transform:lowercase;}
+  .segment-detail{
+    max-height:0; overflow:hidden; transition:max-height 0.25s ease;
+  }
+  .segment-row.active .segment-detail{max-height:220px;}
+  .detail-inner{padding:16px 22px 20px; border-top:1px solid var(--line); font-size:14.5px;}
+  .detail-inner .label{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft);
+    text-transform:uppercase; letter-spacing:0.03em; margin-bottom:4px;
+  }
+  .detail-inner p{margin:0 0 14px;}
+  .detail-inner p:last-child{margin-bottom:0;}
+
+  /* ---------- Chart section ---------- */
+  .chart-section{margin-bottom:44px;}
+  .toggle-row{display:flex; gap:6px; margin-bottom:18px;}
+  .toggle-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; padding:7px 13px;
+    background:var(--paper-raised); border:1px solid var(--line); color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .toggle-btn.active{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+  .chart-box{background:var(--paper-raised); border:1px solid var(--line); padding:20px; height:280px;}
+
+  /* ---------- Methodology note ---------- */
+  .methodology{border-top:2px solid var(--ink); padding-top:20px; font-size:13.5px; color:var(--ink-soft);}
+  .methodology .label{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink); text-transform:uppercase; letter-spacing:0.03em; display:block; margin-bottom:8px;}
+
+  @media (max-width:640px){
+    .kpi-strip{grid-template-columns:repeat(2,1fr);}
+    .kpi:nth-child(2){border-right:none;}
+    .segment-metrics{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">
+      <span id="dateRange">—</span>
+      <span>k-means segmentation · validated vs. gaussian mixture</span>
+    </div>
+    <h1>Retail Customer Segmentation</h1>
+    <p class="subtitle">Behavioral clusters derived from transaction history, profiled for targeted marketing action.</p>
+  </header>
+
+  <div class="kpi-strip" id="kpiStrip"></div>
+
+  <div class="segments">
+    <p class="section-title">segments — click a row to view strategy</p>
+    <div id="segmentList"></div>
+  </div>
+
+  <div class="chart-section">
+    <p class="section-title">value contribution by segment</p>
+    <div class="toggle-row" id="toggleRow"></div>
+    <div class="chart-box"><canvas id="valueChart"></canvas></div>
+  </div>
+
+  <div class="methodology">
+    <span class="label">Methodology note</span>
+    Segments were formed on standardized RFM (recency, frequency, monetary) and behavioral
+    features using K-Means, with k selected by silhouette score within a business-usable range.
+    Segment agreement with a Gaussian Mixture Model cross-check is shown as the Adjusted Rand
+    Index above — higher values indicate the grouping reflects real structure in the data rather
+    than an artifact of one algorithm's assumptions. CLV is a linear 12-month proxy, not a
+    probabilistic lifetime model.
+  </div>
+
+</div>
+
+<script>
+const DATA = {"generated_at": "2026-09-06T13:13:49.088193", "total_customers": 1493, "total_transactions_analyzed": 41283, "date_range": {"start": "2010-12-01", "end": "2011-12-08"}, "chosen_k": 3, "validation": {"kmeans_silhouette": 0.3666, "gmm_silhouette": 0.3361, "ari": 0.8451}, "segments": [{"cluster_id": 1, "name": "Champions", "customer_count": 909, "pct_of_base": 60.9, "recency_days": 60.26, "frequency": 11.16, "monetary_total": 954.85, "avg_order_value": 81.14, "avg_basket_size": 3.29, "category_diversity": 13.55, "clv_per_customer": 390.06, "total_clv": 354565.0, "strategy": "Loyalty & advocacy programs, early access to new products, VIP tiers, referral incentives.", "rationale": "Highest recency, frequency, and monetary value. Retention cost here is far lower than acquisition cost elsewhere, and this group has the highest referral potential."}, {"cluster_id": 0, "name": "At-Risk High Value", "customer_count": 392, "pct_of_base": 26.3, "recency_days": 161.55, "frequency": 1.9, "monetary_total": 169.48, "avg_order_value": 92.71, "avg_basket_size": 3.92, "category_diversity": 6.25, "clv_per_customer": 528.17, "total_clv": 207043.0, "strategy": "Personalized win-back campaigns, time-limited offers, direct outreach (email/call), satisfaction surveys.", "rationale": "High historical spend but rising recency (drifting away). Losing this group has an outsized revenue impact, so proactive intervention has strong expected ROI."}, {"cluster_id": 2, "name": "Hibernating / Lost", "customer_count": 192, "pct_of_base": 12.9, "recency_days": 153.6, "frequency": 1.43, "monetary_total": 47.98, "avg_order_value": 34.31, "avg_basket_size": 1.9, "category_diversity": 2.59, "clv_per_customer": 95.62, "total_clv": 18359.0, "strategy": "Low-cost reactivation campaigns only (broad discount emails, re-engagement sequences); avoid heavy investment.", "rationale": "Long recency and low frequency/monetary value -- the economics rarely justify expensive win-back tactics here."}]};
+
+const TIER_COLOR = {
+  "Champions": "var(--champion)",
+  "At-Risk High Value": "var(--atrisk)",
+  "Hibernating / Lost": "var(--hibernating)",
+};
+function tierColor(name){
+  for(const key in TIER_COLOR){ if(name.startsWith(key)) return TIER_COLOR[key]; }
+  return "var(--ink-soft)";
+}
+function tierColorHex(name){
+  const map = {"Champions":"#2F6F52","At-Risk High Value":"#B5622B","Hibernating / Lost":"#767A73"};
+  for(const key in map){ if(name.startsWith(key)) return map[key]; }
+  return "#5B5D54";
+}
+
+// ---- Header date range ----
+document.getElementById('dateRange').textContent =
+  `${DATA.date_range.start} — ${DATA.date_range.end}`;
+
+// ---- KPI strip ----
+const kpis = [
+  {value: DATA.total_customers.toLocaleString(), label: "customers segmented"},
+  {value: DATA.total_transactions_analyzed.toLocaleString(), label: "transactions analyzed"},
+  {value: DATA.chosen_k, label: "segments identified"},
+  {value: DATA.validation.ari.toFixed(2), label: "cross-model agreement (ARI)"},
+];
+document.getElementById('kpiStrip').innerHTML = kpis.map(k => `
+  <div class="kpi">
+    <span class="kpi-value">${k.value}</span>
+    <span class="kpi-label">${k.label}</span>
+  </div>`).join('');
+
+// ---- Segment rows ----
+const listEl = document.getElementById('segmentList');
+function renderSegments(){
+  listEl.innerHTML = DATA.segments.map((s, i) => `
+    <div class="segment-row" data-idx="${i}" style="--tier-color:${tierColorHex(s.name)}">
+      <div class="stripe"></div>
+      <div class="segment-main">
+        <div class="segment-head">
+          <span class="segment-name">${s.name}</span>
+          <span class="segment-meta">${s.customer_count.toLocaleString()} customers · ${s.pct_of_base}% of base</span>
+        </div>
+        <div class="segment-metrics">
+          <div class="metric"><span class="num">${s.recency_days.toFixed(0)}d</span><span class="lbl">avg recency</span></div>
+          <div class="metric"><span class="num">${s.frequency.toFixed(1)}</span><span class="lbl">avg orders</span></div>
+          <div class="metric"><span class="num">£${s.avg_order_value.toFixed(0)}</span><span class="lbl">avg order value</span></div>
+          <div class="metric"><span class="num">£${s.clv_per_customer.toFixed(0)}</span><span class="lbl">12mo CLV / customer</span></div>
+        </div>
+      </div>
+      <div class="segment-detail">
+        <div class="detail-inner">
+          <span class="label">Recommended strategy</span>
+          <p>${s.strategy}</p>
+          <span class="label">Why</span>
+          <p>${s.rationale}</p>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.segment-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const wasActive = row.classList.contains('active');
+      document.querySelectorAll('.segment-row').forEach(r => r.classList.remove('active'));
+      if(!wasActive) row.classList.add('active');
+    });
+  });
+}
+renderSegments();
+
+// ---- Chart ----
+const metricOptions = [
+  {key:'total_clv', label:'Total CLV', format:v=>'£'+Math.round(v).toLocaleString()},
+  {key:'clv_per_customer', label:'CLV / Customer', format:v=>'£'+v.toFixed(0)},
+  {key:'customer_count', label:'Customer Count', format:v=>v.toLocaleString()},
+];
+let activeMetric = metricOptions[0];
+
+const toggleRow = document.getElementById('toggleRow');
+toggleRow.innerHTML = metricOptions.map((m,i) =>
+  `<button class="toggle-btn ${i===0?'active':''}" data-key="${m.key}">${m.label}</button>`
+).join('');
+
+const ctx = document.getElementById('valueChart').getContext('2d');
+const sorted = [...DATA.segments].sort((a,b) => b.total_clv - a.total_clv);
+let chart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: sorted.map(s => s.name),
+    datasets: [{
+      data: sorted.map(s => s[activeMetric.key]),
+      backgroundColor: sorted.map(s => tierColorHex(s.name)),
+      borderRadius: 2,
+      barThickness: 64,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {display:false},
+      tooltip: {
+        callbacks: { label: (item) => activeMetric.format(item.raw) }
+      }
+    },
+    scales: {
+      y: {
+        ticks: { callback: (v) => activeMetric.format(v), font:{family:"'IBM Plex Mono', monospace", size:11} },
+        grid: { color: '#DEDCD0' }
+      },
+      x: {
+        ticks: { font:{family:"'IBM Plex Mono', monospace", size:12} },
+        grid: { display:false }
+      }
+    }
+  }
+});
+
+toggleRow.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    toggleRow.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeMetric = metricOptions.find(m => m.key === btn.dataset.key);
+    chart.data.datasets[0].data = sorted.map(s => s[activeMetric.key]);
+    chart.options.scales.y.ticks.callback = (v) => activeMetric.format(v);
+    chart.update();
+  });
+});
+</script>
+</body>
+</html>
